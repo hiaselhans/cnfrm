@@ -10,7 +10,7 @@ line configuration with expressive configuration declaration:
 import confmap
 
 
-class MyConf(confmapper.Config):
+class MyConf(confmap.Config):
     name = ConfigField("no name")
     size = IntegerField(required=False)
     path = DirectoryField(required=False)
