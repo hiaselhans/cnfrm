@@ -6,7 +6,7 @@ This library lets you declare your config in a way you might know from
 popular ORM's. Get validation, defaults, popular fileformats and command
 line configuration with expressive configuration declaration:
 
-```
+```python
 import confmap
 
 
