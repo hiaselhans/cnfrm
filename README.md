@@ -1,9 +1,10 @@
-# Configmapper
+# CnfRM
 
 **Imagine: an ORM for config**
 
 This library lets you declare your config in a way you might know from
-popular ORM's. Get validation, defaults, popular fileformats and command
+popular ORM's. 
+Get ConfiRMation, defaults, popular fileformats and command
 line configuration with expressive configuration declaration:
 
 ```python
@@ -11,7 +12,7 @@ import cnfrm
 
 
 class MyConf(cnfrm.Config):
-    name = ConfigField("no name")
+    name = Field("no name")
     size = IntegerField(required=False)
     path = DirectoryField(required=False)
     email = EmailField(required=False)

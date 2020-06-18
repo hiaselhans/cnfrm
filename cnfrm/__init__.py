@@ -1,5 +1,6 @@
 import json
 
+from cnfrm.exceptions import *
 from cnfrm.fields import *
 
 
@@ -11,7 +12,7 @@ class Config():
     def field_names(cls):
         for fieldname in dir(cls):
             field = getattr(cls, fieldname)
-            if isinstance(field, ConfigField):
+            if isinstance(field, Field):
                 yield fieldname
     
     @classmethod
@@ -69,11 +70,6 @@ class Config():
             else:
                 raise ConfigurationError(f"No field named {key}")
 
-
-    def read_env(self):
-        # TODO
-        pass
-
     def read_json(self, filename):
         with open(filename, "r") as infile:
             dct = json.load(infile)
@@ -84,11 +80,3 @@ class Config():
         dct = self.to_dct(include_default)
         with open(filename, "w") as outfile:
             json.dump(dct, outfile)
-
-
-
-
-
-
-
-

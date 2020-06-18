@@ -4,7 +4,7 @@ from email.utils import parseaddr
 
 from cnfrm.exceptions import ValidationError
 
-class ConfigField():
+class Field():
     def __init__(self, default=None, required=True):
         self.default = default
         self.required = required
@@ -15,6 +15,8 @@ class ConfigField():
         self.value = None
 
     def validate(self, value):
+        if self.required and value is None:
+            raise ValidationError("Cannot set required field to None")
         return True
     
     def _raise_validation(self, value):
@@ -47,23 +49,41 @@ class ConfigField():
         else:
             # Usually validate should have raised already.
             # Let's do it again. Just in case...
-            raise ValueError(f"{value} is not a valid value for {self.__class__.__name__}")
+            raise ValidationError(f"{value} is not a valid value for {self.__class__.__name__}")
 
-class IntegerField(ConfigField):
+class NumberField(Field):
+    def __init__(self, default=None, required=True, min_value=None, max_value=None):
+        super().__init__(default, required)
+        self.min_value = min_value
+        self.max_value = max_value
+    
     def validate(self, value):
-        if int(value) != value:
-            self._raise_validation(value)
+        if self.min_value is not None and value < self.min_value:
+            raise ValidationError(f"Min-value constraint not satisfied: {value}")
+        if self.max_value is not None and value > self.max_value:
+            raise ValidationError(f"Max-value constraint not satisfied: {value}")
         
-        return True
+        return super().validate(value)
 
-class FloatField(ConfigField):
+
+class IntegerField(NumberField):
+
     def validate(self, value):
-        if float(value) != value:
+        int_value = int(value)
+        if int_value != value:
+            self._raise_validation(value)
+            
+        return super().validate(int_value)
+
+class FloatField(NumberField):
+    def validate(self, value):
+        float_value = float(value)
+        if float_value != value:
             self._raise_validation(value)
 
-        return True
+        return super().validate(float_value)
 
-class EmailField(ConfigField):
+class EmailField(Field):
     rex = re.compile(r"^[A-Z0-9._%+-]+@[A-Z0-9\.-]+\.[A-Z]{2,63}$")
     def validate(self, value):
         _name, addr = parseaddr(value)
@@ -73,7 +93,7 @@ class EmailField(ConfigField):
         raise ValidationError(f"Not a valid email address: {addr}")
 
 
-class PathField(ConfigField):
+class PathField(Field):
     pass
         
 class FileField(PathField):
