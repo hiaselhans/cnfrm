@@ -2,7 +2,7 @@ import re
 import os
 from email.utils import parseaddr
 
-from confmap.exceptions import *
+from cnfrm.exceptions import ValidationError
 
 class ConfigField():
     def __init__(self, default=None, required=True):

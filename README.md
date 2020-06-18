@@ -7,10 +7,10 @@ popular ORM's. Get validation, defaults, popular fileformats and command
 line configuration with expressive configuration declaration:
 
 ```python
-import confmap
+import cnfrm
 
 
-class MyConf(confmap.Config):
+class MyConf(cnfrm.Config):
     name = ConfigField("no name")
     size = IntegerField(required=False)
     path = DirectoryField(required=False)

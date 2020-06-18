@@ -1,6 +1,6 @@
 import json
 
-from confmap.fields import *
+from cnfrm.fields import *
 
 
 class Config():
