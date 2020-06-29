@@ -1,10 +1,16 @@
 import re
 import os
+import argparse
 from email.utils import parseaddr
+import urllib.parse
 
 from cnfrm.exceptions import ValidationError
 
+__all__ = ["Field", "NumberField", "FloatField", "IntegerField", "EmailField", "PathField", "FileField", "DirectoryField", "UrlField"]
+
 class Field():
+    base_type = str
+
     def __init__(self, default=None, required=True):
         self.default = default
         self.required = required
@@ -32,26 +38,24 @@ class Field():
             return True
         
         return False
-
     
     def __get__(self, instance, owner):
         if instance is None:
             return self
 
-        if self.value is not None:
-            return self.value
-        
-        return self.default
+        return instance._values.get(self, self.default)
     
     def __set__(self, instance, value):
         if self.validate(value):
-            self.value = value
+            instance._values[self] = value
         else:
             # Usually validate should have raised already.
             # Let's do it again. Just in case...
-            raise ValidationError(f"{value} is not a valid value for {self.__class__.__name__}")
+            raise ValidationError(f"'{value}' is not a valid value for {self.__class__.__name__}")
 
 class NumberField(Field):
+    base_type = int
+
     def __init__(self, default=None, required=True, min_value=None, max_value=None):
         super().__init__(default, required)
         self.min_value = min_value
@@ -59,9 +63,9 @@ class NumberField(Field):
     
     def validate(self, value):
         if self.min_value is not None and value < self.min_value:
-            raise ValidationError(f"Min-value constraint not satisfied: {value}")
+            raise ValidationError(f"Min-value constraint not satisfied: '{value}'")
         if self.max_value is not None and value > self.max_value:
-            raise ValidationError(f"Max-value constraint not satisfied: {value}")
+            raise ValidationError(f"Max-value constraint not satisfied: '{value}'")
         
         return super().validate(value)
 
@@ -76,6 +80,8 @@ class IntegerField(NumberField):
         return super().validate(int_value)
 
 class FloatField(NumberField):
+    base_type = float
+
     def validate(self, value):
         float_value = float(value)
         if float_value != value:
@@ -90,7 +96,7 @@ class EmailField(Field):
         if self.rex.match(addr.upper()):
             return True
         
-        raise ValidationError(f"Not a valid email address: {addr}")
+        raise ValidationError(f"Not a valid email address: '{addr}'")
 
 
 class PathField(Field):
@@ -99,13 +105,27 @@ class PathField(Field):
 class FileField(PathField):
     def validate(self, value):
         if not os.path.isfile(value):
-            raise ValidationError(f"Not a file: {value}")
+            raise ValidationError(f"Not a file: '{value}'")
         
         return True
 
 class DirectoryField(PathField):
     def validate(self, value):
         if not os.path.isdir(value):
-            raise ValidationError(f"Not a directory: {value}")
+            raise ValidationError(f"Not a directory: '{value}'")
 
         return True
+
+class UrlField(Field):
+    def validate(self, value):
+        result = urllib.parse.urlparse(value)
+
+        if not result.scheme:
+            raise ValidationError(f"no scheme provided for url: {value}")
+        if not result.path:
+            raise ValidationError(f"no path provided for url: {value}")
+        if not result.netloc:
+            raise ValidationError(f"no domain provided for url: {value}")
+
+        return True
+
