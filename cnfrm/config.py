@@ -18,11 +18,11 @@ class Config():
             field = getattr(cls, fieldname)
             if isinstance(field, Field):
                 yield fieldname
-    
+
     @classmethod
     def get_field(cls, fieldname):
         return getattr(cls, fieldname)
-    
+
     def __getitem__(self, fieldname):
         return getattr(self, fieldname)
 
@@ -31,13 +31,14 @@ class Config():
             fieldnames = self.get_fieldnames()
 
             if fieldname not in fieldnames:
-                raise ConfigurationError(f"'{fieldname}' can not be set for configuration {self}")
+                raise ConfigurationError(
+                    f"'{fieldname}' can not be set for configuration {self}")
 
         try:
             super().__setattr__(fieldname, value)
         except ValidationError:
             raise ValidationError(f"Validation failed for '{fieldname}'")
-    
+
     def to_dct(self, include_default=True):
         dct = {}
         for fieldname in self.get_fieldnames():
@@ -47,9 +48,8 @@ class Config():
                 default = self.get_field(fieldname).default
                 if include_default or value != default:
                     dct[fieldname] = self[fieldname]
-        
-        return dct
 
+        return dct
 
     def __str__(self):
         msg = super().__str__()
@@ -64,7 +64,7 @@ class Config():
                 msg += " "
 
             msg += f"\t{value or ''}"
-        
+
         return msg
 
     def validate(self):
@@ -85,15 +85,15 @@ class Config():
                 setattr(self, key, value)
             else:
                 raise ConfigurationError(f"No field named {key}")
-        
+
         return self
 
     def read_json(self, filename):
         with open(filename, "r") as infile:
             dct = json.load(infile)
-        
+
         self.read_dct(dct)
-        
+
         return self
 
     def dump_json(self, filename, include_default=True):
@@ -113,11 +113,11 @@ class Config():
                 parser.add_argument(fieldname, type=field.base_type)
 
         args = parser.parse_args()
-        for arg, value in args._get_kwargs():
+        for arg, value in args._get_kwargs(): # pylint:disable=protected-access
             if value is not None:
                 setattr(self, arg, value)
 
         if add_configfile and args.c is not None:
             self.read_json(args.c)
-        
+
         return self
