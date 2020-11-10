@@ -1,5 +1,7 @@
 import json
+import os
 import argparse
+from os import stat
 
 from cnfrm.fields import Field
 from cnfrm.exceptions import ValidationError, ConfigurationError
@@ -88,17 +90,21 @@ class Config():
 
         return self
 
-    def read_json(self, filename):
-        with open(filename, "r") as infile:
+    def read_json(self, filename, quiet=False):
+        abspath = self._expand_path(filename)
+        if not os.path.isfile(abspath) and quiet:
+            return
+
+        with open(abspath, "r") as infile:
             dct = json.load(infile)
 
         self.read_dct(dct)
 
         return self
 
-    def dump_json(self, filename, include_default=True):
+    def write_json(self, filename, include_default=True):
         dct = self.to_dct(include_default)
-        with open(filename, "w") as outfile:
+        with open(self._expand_path(filename), "w") as outfile:
             json.dump(dct, outfile, indent=2)
 
     def argparse(self, add_configfile=True, required=True):
@@ -121,3 +127,7 @@ class Config():
             self.read_json(args.c)
 
         return self
+
+    @staticmethod
+    def _expand_path(path):
+        return os.path.abspath(os.path.expanduser(path))

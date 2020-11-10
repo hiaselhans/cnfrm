@@ -6,7 +6,7 @@ import urllib.parse
 from cnfrm.exceptions import ValidationError
 
 __all__ = ["Field", "NumberField", "FloatField", "IntegerField",
-           "EmailField", "PathField", "FileField", "DirectoryField", "UrlField"]
+           "EmailField", "PathField", "FileField", "DirectoryField", "UrlField", "ChoiceField"]
 
 
 class Field():
@@ -57,13 +57,25 @@ class Field():
                 f"'{value}' is not a valid value for {self.__class__.__name__}")
 
 
+class ChoiceField(Field):
+    def __init__(self, choices, default=None, required=True) -> None:
+        self.choices = choices
+        super().__init__(default=default, required=required)
+    
+    def validate(self, value):
+        if value not in self.choices:
+            raise ValidationError(f"{value} is not a valid choice for field {self}")
+
+        return super().validate(value)
+
+
 class NumberField(Field):
     base_type = int
 
     def __init__(self, default=None, required=True, min_value=None, max_value=None):
-        super().__init__(default, required)
         self.min_value = min_value
         self.max_value = max_value
+        super().__init__(default, required)
 
     def validate(self, value):
         if self.min_value is not None and value < self.min_value:
