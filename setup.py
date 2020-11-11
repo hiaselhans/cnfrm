@@ -3,9 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+import cnfrm
+
 setuptools.setup(
     name="cnfrm",
-    version="0.0.1",
+    version=cnfrm.__version__,
     author="hiaselhans",
     author_email="simon.klemenc@gmail.com",
     description="CnfRM - ORM for config",
