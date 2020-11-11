@@ -37,8 +37,8 @@ class Config():
 
         try:
             super().__setattr__(fieldname, value)
-        except ValidationError as e:
-            raise ValidationError(f"Validation failed for '{fieldname}'") from e
+        except ValidationError as exception:
+            raise ValidationError(f"Validation failed for '{fieldname}'") from exception
 
     def to_dct(self, include_default=True):
         dct = {}
