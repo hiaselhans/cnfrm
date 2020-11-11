@@ -1,7 +1,6 @@
 import json
 import os
 import argparse
-from os import stat
 
 from cnfrm.fields import Field
 from cnfrm.exceptions import ValidationError, ConfigurationError
@@ -38,8 +37,8 @@ class Config():
 
         try:
             super().__setattr__(fieldname, value)
-        except ValidationError:
-            raise ValidationError(f"Validation failed for '{fieldname}'")
+        except ValidationError as e:
+            raise ValidationError(f"Validation failed for '{fieldname}'") from e
 
     def to_dct(self, include_default=True):
         dct = {}
@@ -93,7 +92,7 @@ class Config():
     def read_json(self, filename, quiet=False):
         abspath = self._expand_path(filename)
         if not os.path.isfile(abspath) and quiet:
-            return
+            return self
 
         with open(abspath, "r") as infile:
             dct = json.load(infile)

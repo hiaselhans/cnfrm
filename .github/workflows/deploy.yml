@@ -1,0 +1,29 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-src-pkg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Make source distribution
+        run: python setup.py sdist
+      - name: Upload source distribution
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+      - name: Publish distribution package to PyPI
+        #if: env.branch == 'master'
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: ${{ secrets.pypi_user }}
+          password: ${{ secrets.pypi_password }}
