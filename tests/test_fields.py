@@ -71,7 +71,7 @@ class TestFields(unittest.TestCase):
             self.config.path = test_dir
     
     def test_dump(self):
-        self.config.dump_json("test.json")
+        self.config.write_json("test.json")
         config2 = self.Config().read_json("test.json")
 
         for key in self.config.get_fieldnames():
