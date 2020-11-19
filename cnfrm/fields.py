@@ -6,7 +6,8 @@ import urllib.parse
 from cnfrm.exceptions import ValidationError
 
 __all__ = ["Field", "NumberField", "FloatField", "IntegerField",
-           "EmailField", "PathField", "FileField", "DirectoryField", "UrlField", "ChoiceField", "BooleanField"]
+           "EmailField", "PathField", "FileField", "DirectoryField", "UrlField", 
+           "ChoiceField", "BooleanField"]
 
 
 class Field():
