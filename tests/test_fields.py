@@ -70,7 +70,11 @@ class TestFields(unittest.TestCase):
         with self.assertRaisesValidation():
             self.config.path = test_dir
     
+<<<<<<< HEAD
     def test_dump(self):
+=======
+    def test_write_json(self):
+>>>>>>> 94e03d9 (update readme, rename dump_json function)
         self.config.write_json("test.json")
         config2 = self.Config().read_json("test.json")
 
