@@ -78,18 +78,18 @@ class Config():
 
         return True
 
-    def read_dct(self, dct):
+    def read_dct(self, dct, ignore_missing=True):
         fieldnames = list(self.get_fieldnames())
 
         for key, value in dct.items():
             if key in fieldnames:
                 setattr(self, key, value)
-            else:
+            elif ignore_missing:
                 raise ConfigurationError(f"No field named {key}")
 
         return self
 
-    def read_json(self, filename, quiet=False):
+    def read_json(self, filename, quiet=False, ignore_missing=True):
         abspath = self._expand_path(filename)
         if not os.path.isfile(abspath) and quiet:
             return self
@@ -97,7 +97,7 @@ class Config():
         with open(abspath, "r") as infile:
             dct = json.load(infile)
 
-        self.read_dct(dct)
+        self.read_dct(dct, ignore_missing=ignore_missing)
 
         return self
 
