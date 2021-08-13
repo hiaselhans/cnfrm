@@ -84,7 +84,7 @@ class Config():
         for key, value in dct.items():
             if key in fieldnames:
                 setattr(self, key, value)
-            elif ignore_missing:
+            elif not ignore_missing:
                 raise ConfigurationError(f"No field named {key}")
 
         return self
